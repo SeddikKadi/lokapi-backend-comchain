@@ -1,0 +1,5 @@
+NAME="@lokavaluto/lokapi-backend-comchain"
+DESCRIPTION="ComChain backend for LokAPI"
+EMAIL="valentin.lab@kalysto.org"
+AUTHOR="Valentin LAB"
+AUTHOR_EMAIL="$AUTHOR <$EMAIL>"

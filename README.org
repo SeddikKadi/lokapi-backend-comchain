@@ -1,0 +1,87 @@
+# -*- ispell-local-dictionary: "english" -*-
+
+#+TITLE: Comchain backend for Lokavaluto's LokAPI
+
+This is a backend for managing any comchain currency through LokAPI.
+The latter aims at providing a simple framework for building client
+app to manage currency payments. You can refer to =lokapi='s doc to
+get more knowledge of how to use it.
+
+* Adding =@lokavaluto/lokapi-backend-comchain= to your project
+
+From the root of your project:
+
+#+begin_src sh
+npm install --save @lokavaluto/lokapi-backend-comchain
+#+end_src
+
+Or better, as =@lokavaluto/lokapi-backend-comchain= is still in early release,
+
+#+begin_src sh
+npm install --save Lokavaluto/lokapi-backend-comchain#master
+#+end_src
+
+To be sure to get the latest version, relaunch this last command
+whenever you want to update.
+
+
+* Usage
+
+You can provide this backend when subclassing LokAPI:
+
+For instance:
+
+#+begin_src typescript
+import LokAPIBrowserAbstract from "@lokavaluto/lokapi-browser"
+
+import comchain from '@lokavaluto/lokapi-backend-comchain'
+
+class LokAPI extends LokAPIBrowserAbstract {
+
+  BackendFactories = {
+    comchain,
+  }
+
+  requestLocalPassword = async function (state: string) {
+    // ... your UI code to request password from user
+  }
+
+  requestLogin() {
+    // ... your UI code to request password from user
+  }
+
+}
+
+if (!process.env.VUE_APP_LOKAPI_HOST) {
+  throw new Error("Please specify VUE_APP_LOKAPI_HOST in '.env'")
+}
+
+if (!process.env.VUE_APP_LOKAPI_DB) {
+  throw new Error("Please specify VUE_APP_LOKAPI_DB in '.env'")
+}
+
+export var lokAPI = new LokAPI(
+  process.env.VUE_APP_LOKAPI_HOST,
+  process.env.VUE_APP_LOKAPI_DB,
+)
+#+end_src
+
+
+For usage of =lokapi=, please refer to =lokapi='s documentation.
+
+* Developers
+
+To get started developing and tinkering with this code, you can:
+
+** Install dependencies
+
+#+begin_src sh
+npm install
+#+end_src
+
+** Build the project
+
+#+begin_src sh
+npx tsc -w
+#+end_src
+
