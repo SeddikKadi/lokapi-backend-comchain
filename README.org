@@ -4,8 +4,8 @@
 
 This is a backend for managing any comchain currency through LokAPI.
 The latter aims at providing a simple framework for building client
-app to manage currency payments. You can refer to =lokapi='s doc to
-get more knowledge of how to use it.
+app to manage currency payments. You can refer to
+=@lokavaluto/lokapi='s doc to get more knowledge of how to use it.
 
 * Adding =@lokavaluto/lokapi-backend-comchain= to your project
 
@@ -67,7 +67,8 @@ export var lokAPI = new LokAPI(
 #+end_src
 
 
-For usage of =lokapi=, please refer to =lokapi='s documentation.
+For usage of =@lokavaluto/lokapi=, please refer to
+=@lokavaluto/lokapi='s documentation.
 
 * Developers
 
