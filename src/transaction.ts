@@ -17,10 +17,13 @@ export class ComchainTransaction extends BridgeObject implements t.ITransaction 
     }
 
     get description () {
-        const data = this.backends.comchain.jsc3l.memo.getTransactionMemo(
-            this.jsonData.comchain, `0x${this.parent.jsonData.wallet.address}`,
-            this.parent.jsonData.message_key)
-        return data
+        if (this.parent.jsonData.message_key) {
+            const data = this.backends.comchain.jsc3l.memo.getTransactionMemo(
+                this.jsonData.comchain, `0x${this.parent.jsonData.wallet.address}`,
+                this.parent.jsonData.message_key)
+            return data
+        }
+        return ''
     }
 
     get id () {
