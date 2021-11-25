@@ -29,12 +29,12 @@ export class ComchainTransaction extends BridgeObject implements t.ITransaction 
 
     get related () {
         const add = this.jsonData.comchain.addr_to.substring(2)
-        return this.jsonData.odoo[add].display_name
+        return this.jsonData.odoo[add]?.display_name || `0x${add}`
     }
 
     get relatedUser () {
         const add = this.jsonData.comchain.addr_to.substring(2)
-        return { display: this.jsonData.odoo[add].display_name }
+        return { display: this.jsonData.odoo[add]?.display_name || `0x${add}` }
     }
 
 }
