@@ -119,12 +119,6 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
         return recipients
     }
 
-
-    get internalId () {
-        return "comchain"
-    }
-
-
     public async * getTransactions (order:any): AsyncGenerator {
         yield * mux(
             Object.values(this.userAccounts).map(
