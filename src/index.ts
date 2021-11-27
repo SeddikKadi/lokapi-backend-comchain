@@ -54,7 +54,7 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
     private get userAccounts () {
         if (!this._userAccounts) {
             this._userAccounts = {}
-            this.jsonData.bank_accounts.forEach(
+            this.jsonData.accounts.forEach(
                 (bankAccountData: IJsonDataWithAddress) => {
                     const comchainUserAccount = this.getSubBackend(
                         this.jsc3l,
@@ -147,7 +147,6 @@ export class ComchainUserAccount {
         if (!this._currencyMgrPromise) {
             // This will trigger the discovery of master servers and load
             // the server conf of the currency.
-            console.log(`Loading ComChain CurrencyMgr for ${this.jsonData.wallet.server.name}`)
             this._currencyMgrPromise = this.backends.comchain.getCurrencyMgr(
                 this.jsonData.wallet.server.name,
             )
