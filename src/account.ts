@@ -19,7 +19,15 @@ export class ComchainAccount extends BridgeObject implements t.IAccount {
     }
 
     async getSymbol () {
-        return this.backends.comchain.customization.getCurrencies()['CUR']
+        let type = this.type
+        let currencies = this.backends.comchain.customization.getCurrencies()
+        if (type == "Nant") {
+            return currencies['CUR_nanti']
+        } else if (type == "Cm") {
+            return currencies['CUR_credit_mut']
+        } else {
+            throw new Error(`Unexpected type ${this.type} for account`)
+        }
     }
 
     get internalId () {
