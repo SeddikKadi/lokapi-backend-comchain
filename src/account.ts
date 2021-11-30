@@ -7,6 +7,11 @@ import { BridgeObject } from '@lokavaluto/lokapi/build/backend'
 
 export class ComchainAccount extends BridgeObject implements t.IAccount {
 
+
+    get type() {
+        return this.jsonData.comchain.type
+    }
+
     async getBalance () {
         const cc = this.backends.comchain
         const wid = this.parent.jsonData.wallet.address
@@ -18,7 +23,7 @@ export class ComchainAccount extends BridgeObject implements t.IAccount {
     }
 
     get internalId () {
-        return `${this.parent.internalId}/${this.parent.address}/${this.jsonData.comchain.type}`
+        return `${this.parent.internalId}/${this.type}`
     }
 
     public async transfer (recipient: ComchainRecipient, amount: number, description: string) {
