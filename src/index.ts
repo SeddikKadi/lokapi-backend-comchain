@@ -145,6 +145,10 @@ export class ComchainUserAccount {
         this.jsonData = jsonData
     }
 
+    public get active () {
+        return this.jsonData.active
+    }
+
     public async getSymbol () {
         const currencyMgr = await this.getCurrencyMgr()
         let currencies = currencyMgr.customization.getCurrencies()
@@ -190,6 +194,8 @@ export class ComchainUserAccount {
      *
      */
     async getAccounts () {
+        if (!this.active) return []
+
         const accounts = []
         const currencyMgr = await this.getCurrencyMgr()
         if (currencyMgr.customization.hasNant()) {
@@ -222,6 +228,8 @@ export class ComchainUserAccount {
     }
 
     public async * getTransactions (order: any): AsyncGenerator {
+        if (!this.active) return
+
         const currencyMgr = await this.getCurrencyMgr()
         const addressResolve = {}
         const limit = 30
