@@ -51,7 +51,7 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
         }, this, jsonData)
     }
 
-    private get userAccounts () {
+    public get userAccounts () {
         if (!this._userAccounts) {
             this._userAccounts = {}
             this.jsonData.accounts.forEach(
