@@ -145,6 +145,18 @@ export class ComchainUserAccount {
         this.jsonData = jsonData
     }
 
+    public async getSymbol () {
+        const currencyMgr = await this.getCurrencyMgr()
+        let currencies = currencyMgr.customization.getCurrencies()
+        return currencies.CUR
+    }
+
+    public async getCurrencyName () {
+        const currencyMgr = await this.getCurrencyMgr()
+        let currencies = currencyMgr.customization.getCurrencies()
+        return currencies.CUR_global
+    }
+
     private async getCurrencyMgr () {
         if (!this._currencyMgrPromise) {
             // This will trigger the discovery of master servers and load
@@ -158,6 +170,19 @@ export class ComchainUserAccount {
 
     _currencyMgrPromise: { [index: string]: any }
 
+
+    /**
+     * getBalance on the User Account sums all the balances of user accounts
+     */
+    public async getBalance (): Promise<number> {
+        const bankAccounts = await this.getAccounts()
+        const balances = await Promise.all(
+            bankAccounts.map((bankAccount: any) => bankAccount.getBalance())
+        )
+        return <number>balances.map(
+            (a:string) => parseFloat(a)
+        ).reduce((s: number, a:number) => s + a, 0)
+    }
 
     /**
      * In the current implementation, a user is identified by its wallet, and as

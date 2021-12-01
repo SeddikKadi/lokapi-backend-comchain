@@ -18,7 +18,12 @@ export class ComchainAccount extends BridgeObject implements t.IAccount {
         return await cc.bcRead[`get${this.jsonData.comchain.type}Balance`](wid)
     }
 
-    async getSymbol () {
+    public async getSymbol () {
+        let currencies = this.backends.comchain.customization.getCurrencies()
+        return currencies.CUR
+    }
+
+    public async getCurrencyName () {
         let type = this.type
         let currencies = this.backends.comchain.customization.getCurrencies()
         if (type == "Nant") {
