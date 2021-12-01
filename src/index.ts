@@ -48,7 +48,7 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
         return new ComchainUserAccount({
             comchain: jsc3l,
             ...this.backends
-        }, jsonData)
+        }, this, jsonData)
     }
 
     private get userAccounts () {
@@ -133,12 +133,14 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
 export class ComchainUserAccount {
 
     address: string
+    parent: BackendAbstract
     backends: { [index: string]: any }
     jsonData: { [index: string]: any }
 
 
-    constructor (backends, jsonData) {
+    constructor (backends, parent, jsonData) {
         this.address = jsonData.wallet.address
+        this.parent = parent
         this.backends = backends
         this.jsonData = jsonData
     }
