@@ -1,6 +1,6 @@
 import Jsc3lAbstract from '@com-chain/jsc3l'
 
-import { t } from '@lokavaluto/lokapi'
+import { t, e } from '@lokavaluto/lokapi'
 import { mux } from '@lokavaluto/lokapi/build/generator'
 import { BackendAbstract } from '@lokavaluto/lokapi/build/backend'
 
@@ -11,6 +11,37 @@ import { ComchainTransaction } from './transaction'
 
 interface IJsonDataWithAddress extends t.JsonData {
     address: string
+}
+
+
+/** Password checking utilities */
+
+const PASSWORD_REGEX = {
+    tooShort: (size:number) => RegExp(`.{${size},}`),
+    noUpperCase: /[A-Z]/,
+    noLowerCase: /[a-z]/,
+    noDigit: /[0-9]/,
+    noSymbol: /[^A-Za-z0-9]/
+
+}
+
+
+function makePasswordChecker(checks: Array<String>): (password: string) => Array<string> {
+    return (password) => {
+        const issues = []
+        checks.forEach((checkStr) => {
+            const [ checkId, argsStr ] = checkStr.split(':')
+            const args = (argsStr || '').split(',')
+            let check = PASSWORD_REGEX[checkId]
+            if (!check) {
+                throw new Error(`Invalid check identifier ${checkId}`)
+            }
+            check = check instanceof RegExp ? check : check.apply(null, [args])
+
+            if (!check.test(password)) issues.push(checkStr)
+        })
+        return issues
+    }
 }
 
 
@@ -125,6 +156,39 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
                 (u: ComchainUserAccount) => u.getTransactions(order)),
             order
         )
+    }
+
+    isPasswordStrongEnoughSync = makePasswordChecker([
+        "tooShort:8",
+        "noUpperCase",
+        "noLowerCase",
+        "noDigit",
+        // "noSymbol",
+    ])
+
+    public async isPasswordStrongEnough (password:string): Promise<Array<string>> {
+        return this.isPasswordStrongEnoughSync(password)
+    }
+
+    public async createUserAccount ({ password }): Promise<Boolean> {
+        const currencyMgr = await this.jsc3l.getCurrencyMgr(
+            this.jsonData.type.split(':')[1],
+        )
+        const wallet = await currencyMgr.wallet.createWallet()
+        const cipheredWallet = wallet.encryptWallet(password)
+        let res = await this.backends.odoo.$post('/comchain/register', {
+            address: cipheredWallet.address,
+            wallet: JSON.stringify(cipheredWallet),
+            message_key: wallet.messageKeysFromWallet(),
+        })
+        if (res.error) {
+            console.error(`Failed to create user account: ${res.error}`)
+            if (res.error === "account already exists") {
+                throw new e.UserAccountAlreadyExists(res.error)
+            }
+            throw new Error(res.error)
+        }
+        return res
     }
 
 }
