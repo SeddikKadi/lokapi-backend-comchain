@@ -1,6 +1,9 @@
 import { t, e } from '@lokavaluto/lokapi'
 import { Contact } from '@lokavaluto/lokapi/build/backend/odoo/contact'
 
+import { sleep, queryUntil } from '@lokavaluto/lokapi/build/utils'
+
+
 import { ComchainPayment } from './payment'
 
 
@@ -40,6 +43,45 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
         return new ComchainPayment({ comchain: this.backends.comchain }, this, {
             comchain: jsonData,
         })
+    }
+
+    public async validateCreation() {
+        const comchain = this.backends.comchain
+        const wallet = comchain.jsonData.wallet
+        const destAddress = this.jsonData.comchain.address
+        const [type, limitMin, limitMax] = [1, -1000, 3000]
+        if (!(await this.backends.comchain.hasUserAccountValidationRights())) {
+            throw new e.PermissionDenied("You need to be admin to validate creation of wallet")
+        }
+        const status = await this.parent.jsc3l.bcRead.getAccountStatus(destAddress)
+        if (status != 1) {
+            const clearWallet = await this.backends.comchain.unlockWallet()
+            await this.parent.jsc3l.bcTransaction.setAccountParam(
+                clearWallet, destAddress, 1, type, limitMin, limitMax)
+            try {
+                queryUntil(() => this.parent.jsc3l.bcRead.getAccountStatus(destAddress),
+                           (res) => res === 1)
+            } catch(err) {
+                if (err instanceof e.TimeoutError) {
+                    console.log("Transaction did not change account status in the expected time frame.")
+                    throw err
+                }
+                throw err
+            }
+        }
+        console.log('Account is already validated, warning administrative backend')
+        const res = await this.backends.odoo.$post(
+            '/comchain/activate', {
+                accounts: [{
+                    address: destAddress,
+                    type,
+                    credit_min: limitMin,
+                    credit_max: limitMax,
+                }]
+            })
+        if (!res) {
+            throw new Error('Admin backend refused activation of ${destAddress}')
+        }
     }
 
     get internalId () {
