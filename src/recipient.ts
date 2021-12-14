@@ -1,4 +1,4 @@
-import { t } from '@lokavaluto/lokapi'
+import { t, e } from '@lokavaluto/lokapi'
 import { Contact } from '@lokavaluto/lokapi/build/backend/odoo/contact'
 
 import { ComchainPayment } from './payment'
@@ -39,9 +39,17 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
                 console.log('Failed to unlock wallet', e)
             }
         }
-        const jsonData = await jsc3l.bcTransaction.transferNant(
-            clearWallet, destAddress, amount, data)
 
+        let jsonData
+        try {
+            jsonData = await jsc3l.bcTransaction.transferNant(
+                clearWallet, destAddress, amount, data)
+        } catch(err) {
+            if (err.msg === "Account_Locked_Error") {
+                throw new e.InactiveAccount("You can't transfer from an inactive account.")
+            }
+            throw err
+        }
         return new ComchainPayment({ comchain: this.backends.comchain }, this, {
             comchain: jsonData,
         })

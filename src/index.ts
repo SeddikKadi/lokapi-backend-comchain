@@ -102,7 +102,6 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
 
     private _userAccounts: any
 
-
     public async getAccounts (): Promise<any> {
         const backendBankAccounts = []
         for (const id in this.userAccounts) {
