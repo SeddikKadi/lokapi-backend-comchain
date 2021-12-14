@@ -48,7 +48,7 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
     }
 
     get internalId () {
-        return `${this.parent.internalId}/${this.backends.comchain.owner_id}`
+        return `${this.parent.internalId}/${this.jsonData.comchain.address}`
     }
 
 }
