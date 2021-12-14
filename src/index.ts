@@ -265,6 +265,28 @@ export class ComchainUserAccount {
         // In comchain, either you are admin or not
         return (await this.getType()) == 2
     }
+
+
+    /**
+     * This action will use `requestLocalPassword` that is provided by
+     * the GUI.
+     */
+    public async unlockWallet() {
+        let password
+        let state = 'firstTry'
+        while (true) {
+            password = await this.parent.requestLocalPassword(state)
+            try {
+                return this.backends.comchain.wallet.getWalletFromPrivKeyFile(
+                    JSON.stringify(this.jsonData.wallet), password)
+            } catch (e) {
+                state = 'failedUnlock'
+                console.log('Failed to unlock wallet', e)
+            }
+        }
+    }
+
+
     /**
      * In the current implementation, a user is identified by its wallet, and as
      * such, it is also having only one account.

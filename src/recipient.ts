@@ -13,7 +13,6 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
     public async transfer (amount: number, description: string) {
         // XXXvlab: yuck, there need to be a clean up and rationalisation
         //   of these backends and jsonData link madness
-        const lokapi = this.backends.odoo
         const comchain = this.backends.comchain
         const jsc3l = this.parent.jsc3l
         const wallet = comchain.jsonData.wallet
@@ -26,19 +25,7 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
             description, description
         )
 
-        let password, clearWallet
-        let state = 'firstTry'
-        while (true) {
-            password = await this.parent.requestLocalPassword(state)
-            try {
-                clearWallet = jsc3l.wallet.getWalletFromPrivKeyFile(
-                    JSON.stringify(wallet), password)
-                break
-            } catch (e) {
-                state = 'failedUnlock'
-                console.log('Failed to unlock wallet', e)
-            }
-        }
+        const clearWallet = await this.backends.comchain.unlockWallet()
 
         let jsonData
         try {
