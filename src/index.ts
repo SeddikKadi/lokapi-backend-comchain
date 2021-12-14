@@ -251,6 +251,21 @@ export class ComchainUserAccount {
         ).reduce((s: number, a:number) => s + a, 0)
     }
 
+
+    private _type: number
+    private async getType () {
+        if (!this._type) {
+            const currencyMgr = await this.getCurrencyMgr()
+            this._type = await currencyMgr.bcRead.getAccountType(this.address)
+        }
+        return this._type
+    }
+
+
+    public async hasUserAccountValidationRights () {
+        // In comchain, either you are admin or not
+        return (await this.getType()) == 2
+    }
     /**
      * In the current implementation, a user is identified by its wallet, and as
      * such, it is also having only one account.
