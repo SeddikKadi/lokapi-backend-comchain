@@ -132,7 +132,6 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
             )
         }
         jsonData.monujo_backends[this.internalId].forEach((address: string) => {
-            // Each ownerId here is a different account in comchain for recipient
             recipients.push(
                 new ComchainRecipient(
                     {
