@@ -267,6 +267,12 @@ export class ComchainUserAccount {
     }
 
 
+    public async hasCreditRequestValidationRights () {
+        // In comchain, either you are admin or not
+        return (await this.getType()) == 2
+    }
+
+
     /**
      * This action will use `requestLocalPassword` that is provided by
      * the GUI.
