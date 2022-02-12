@@ -261,6 +261,16 @@ export class ComchainUserAccount {
     }
 
 
+    private _status: number
+    private async getStatus () {
+        if (!this._status) {
+            const currencyMgr = await this.getCurrencyMgr()
+            this._status = await currencyMgr.bcRead.getAccountStatus(this.address)
+        }
+        return this._status
+    }
+
+
     public async hasUserAccountValidationRights () {
         // In comchain, either you are admin or not
         return (await this.getType()) == 2
@@ -272,6 +282,9 @@ export class ComchainUserAccount {
         return (await this.getType()) == 2
     }
 
+    public async isActiveAccount () {
+        return (await this.getStatus()) == 1
+    }
 
     /**
      * This action will use `requestLocalPassword` that is provided by
