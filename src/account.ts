@@ -7,6 +7,9 @@ import { BridgeObject } from '@lokavaluto/lokapi/build/backend'
 
 export class ComchainAccount extends BridgeObject implements t.IAccount {
 
+    get creditable() {
+        return this.type === 'Nant'
+    }
 
     get type() {
         return this.jsonData.comchain.type
