@@ -53,8 +53,9 @@ export class ComchainAccount extends BridgeObject implements t.IAccount {
      * @returns Object
      */
     public async getCreditUrl (amount: number): Promise<string> {
+        const wid = this.parent.jsonData.wallet.address
         return this.backends.odoo.$post('/comchain/credit', {
-            owner_id: this.parent.ownerId,
+            comchain_address: wid,
             amount,
         })
     }
