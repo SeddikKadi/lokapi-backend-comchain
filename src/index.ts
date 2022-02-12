@@ -7,6 +7,7 @@ import { BackendAbstract } from '@lokavaluto/lokapi/build/backend'
 import { ComchainAccount } from './account'
 import { ComchainRecipient } from './recipient'
 import { ComchainTransaction } from './transaction'
+import { ComchainCreditRequest } from './creditRequest'
 
 
 interface IJsonDataWithAddress extends t.JsonData {
@@ -146,6 +147,26 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
             )
         })
         return recipients
+    }
+
+    public makeCreditRequest (jsonData: t.JsonData): Promise<t.ICreditRequest> {
+        const creditRequests = []
+        if (Object.keys(this.userAccounts).length === 0) {
+            throw new Error(
+                'Current user has no account in comchain. Unsupported yet.'
+            )
+        }
+        if (Object.keys(this.userAccounts).length > 1) {
+            // We will need to select one of the source userAccount of the
+            // current logged in user
+            throw new Error(
+                'Current user has more than one account in comchain. ' +
+                    'Unsupported yet.'
+            )
+        }
+
+        const userAccount = Object.values(this.userAccounts)[0] as ComchainUserAccount
+        return userAccount.makeCreditRequest(jsonData)
     }
 
     public async * getTransactions (order:any): AsyncGenerator {
@@ -409,4 +430,20 @@ export class ComchainUserAccount {
             offset += limit
         }
     }
+
+    public async makeCreditRequest (jsonData: t.JsonData): Promise<t.ICreditRequest> {
+        const currencyMgr = await this.getCurrencyMgr()
+        return new ComchainCreditRequest(
+            {
+                comchain: currencyMgr,
+                ...this.backends,
+            },
+            this,
+            {
+                odoo: jsonData,
+                comchain: { address: jsonData.monujo_backend[1] },
+            }
+        )
+    }
+
 }
