@@ -29,9 +29,9 @@ export class ComchainAccount extends BridgeObject implements t.IAccount {
     public async getCurrencyName () {
         let type = this.type
         let currencies = this.backends.comchain.customization.getCurrencies()
-        if (type == "Nant") {
+        if (type === "Nant") {
             return currencies['CUR_nanti']
-        } else if (type == "Cm") {
+        } else if (type === "Cm") {
             return currencies['CUR_credit_mut']
         } else {
             throw new Error(`Unexpected type ${this.type} for account`)
