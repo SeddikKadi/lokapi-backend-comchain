@@ -1,0 +1,6 @@
+.env*
+node_modules
+build
+docs
+README.md
+/package-lock.json
