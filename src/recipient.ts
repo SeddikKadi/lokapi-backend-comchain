@@ -22,7 +22,12 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
         const destAddress = this.jsonData.comchain.address
         const messageKey = await jsc3l.ajaxReq.getMessageKey(
             `0x${destAddress}`, false)
-
+        if (amount < 0) {
+            throw new e.NegativeAmount(`Negative amounts for transfer are invalid (amount: ${amount})`)
+        }
+        if (amount == 0) {
+            throw new e.NullAmount("Null amount for transfer is invalid")
+        }
         const data = jsc3l.memo.getTxMemoCipheredData(
             wallet.message_key.pub, messageKey.public_message_key,
             description, description
@@ -35,8 +40,11 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
             jsonData = await jsc3l.bcTransaction.transferNant(
                 clearWallet, destAddress, amount, data)
         } catch(err) {
+            if (err.msg === "Incompatible_Amount") {
+                throw new e.RefusedAmount("Amount refused by backend (do you have enough money ?)")
+            }
             if (err.msg === "Account_Locked_Error") {
-                throw new e.InactiveAccount("You can't transfer from an inactive account.")
+                throw new e.InactiveAccount("You can't transfer from/to an inactive account.")
             }
             throw err
         }
