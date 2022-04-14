@@ -377,11 +377,13 @@ export class ComchainUserAccount {
             const transactionsData = await currencyMgr.ajaxReq.getTransList(
                 `0x${this.address}`, limit, offset)
             const uniqueAddresses = transactionsData.map(
-                (t: any) => t.addr_to.substring(2)
+                (t: any) => t[t.direction === 2 ? "addr_from" : "addr_to"]
             ).filter(
-                (t: any, idx: number, self) => self.indexOf(t) === idx
-            ).filter(
-                (t: any) => (typeof addressResolve[t] === 'undefined')
+                (t: any, idx: number, self) => (self.indexOf(t) === idx) &&
+                    (typeof addressResolve[t] === 'undefined') &&
+                    (t !== 'Admin')
+            ).map(
+                (t: any) => t.substring(2)
             )
             if (uniqueAddresses.length > 0) {
                 const partners = await this.backends.odoo.$post('/comchain/partners', {
