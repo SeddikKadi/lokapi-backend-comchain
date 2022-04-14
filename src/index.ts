@@ -377,7 +377,7 @@ export class ComchainUserAccount {
             const transactionsData = await currencyMgr.ajaxReq.getTransList(
                 `0x${this.address}`, limit, offset)
             const uniqueAddresses = transactionsData.map(
-                (t: any) => t.addr_to.substring(2)
+                (t: any) => t[t.direction ? "addr_from": "addr_to"].substring(2)
             ).filter(
                 (t: any, idx: number, self) => self.indexOf(t) === idx
             ).filter(
