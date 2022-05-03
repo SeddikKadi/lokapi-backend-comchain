@@ -41,7 +41,14 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
                 clearWallet, destAddress, amount, data)
         } catch(err) {
             if (err.msg === "Incompatible_Amount") {
-                throw new e.RefusedAmount("Amount refused by backend (do you have enough money ?)")
+                if (err.data === 'InsufficientNantBalance') {
+                    throw new e.InsufficientBalance(
+                        'Insufficient fund to afford transfer'
+                    )
+                }
+                throw new e.RefusedAmount(
+                    'Amount refused by backend (given reason: `${err.data}`)'
+		)
             }
             if (err.msg === "Account_Locked_Error") {
                 throw new e.InactiveAccount("You can't transfer from/to an inactive account.")
