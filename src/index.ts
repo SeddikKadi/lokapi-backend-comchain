@@ -312,6 +312,10 @@ export class ComchainUserAccount {
         return (await this.getStatus()) == 1
     }
 
+    public async requiresUnlock () {
+        return true
+    }
+
     /**
      * This action will use `requestLocalPassword` that is provided by
      * the GUI.
