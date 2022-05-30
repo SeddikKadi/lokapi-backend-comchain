@@ -317,17 +317,42 @@ export class ComchainUserAccount {
     }
 
     /**
-     * This action will use `requestLocalPassword` that is provided by
-     * the GUI.
+     * Use `requestLocalPassword` that is provided by the GUI to
+     * return the decrypted wallet. You can override this global setting
+     * by providing an async function as first argument.
      */
-    public async unlockWallet() {
+    public async unlockWallet(requestCredentialsFromUserFn?: any) {
+        let [ _password, wallet ] = await this._unlockWallet(requestCredentialsFromUserFn)
+        return wallet
+    }
+
+    /**
+     * Use `requestLocalPassword` that is provided by the GUI to
+     * return the decrypted wallet. You can override this global setting
+     * by providing an async function as first argument.
+     */
+    public async requestCredentials(requestCredentialsFromUserFn?: any) {
+        let [ password, _wallet ] = await this._unlockWallet(requestCredentialsFromUserFn)
+        return password
+    }
+
+    /**
+     * Use `requestLocalPassword` that is provided by the GUI to
+     * return the decrypted wallet. You can override this global setting
+     * by providing an async function as first argument.
+     */
+    private async _unlockWallet(requestCredentialsFromUserFn?: any) {
         let password
         let state = 'firstTry'
+        requestCredentialsFromUserFn = requestCredentialsFromUserFn || this.parent.requestLocalPassword
         while (true) {
-            password = await this.parent.requestLocalPassword(state)
+            password = await requestCredentialsFromUserFn(state, this)
             try {
-                return this.backends.comchain.wallet.getWalletFromPrivKeyFile(
-                    JSON.stringify(this.jsonData.wallet), password)
+                return [
+                    password,
+                    this.backends.comchain.wallet.getWalletFromPrivKeyFile(
+                        JSON.stringify(this.jsonData.wallet), password),
+                    ]
             } catch (e) {
                 state = 'failedUnlock'
                 console.log('Failed to unlock wallet', e)
