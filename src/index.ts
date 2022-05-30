@@ -189,7 +189,7 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
         return this.isPasswordStrongEnoughSync(password)
     }
 
-    public async createUserAccount ({ password }): Promise<Boolean> {
+    public async createUserAccount ({ password }): Promise<ComchainUserAccount> {
         const currencyMgr = await this.jsc3l.getCurrencyMgr(
             this.jsonData.type.split(':')[1],
         )
@@ -207,7 +207,12 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
             }
             throw new Error(res.error)
         }
-        return res
+        return this.getSubBackend(this.jsc3l, {
+            active: false,
+            address: cipheredWallet.address,
+            wallet: cipheredWallet,
+            message_key: wallet.messageKeysFromWallet(),
+        })
     }
 
 }
