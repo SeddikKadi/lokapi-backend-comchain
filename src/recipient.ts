@@ -17,6 +17,10 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
         return this.backends.comchain
     }
 
+    getSymbol () {
+        return this.fromUserAccount.getSymbol()
+    }
+
     public async transfer (amount: number, description: string) {
         // XXXvlab: yuck, there need to be a clean up and rationalisation
         //   of these backends and jsonData link madness
