@@ -18,20 +18,22 @@ interface IJsonDataWithAddress extends t.JsonData {
 /** Password checking utilities */
 
 const PASSWORD_REGEX = {
-    tooShort: (size:number) => RegExp(`.{${size},}`),
+    tooShort: (size: number) => RegExp(`.{${size},}`),
     noUpperCase: /[A-Z]/,
     noLowerCase: /[a-z]/,
     noDigit: /[0-9]/,
-    noSymbol: /[^A-Za-z0-9]/
+    noSymbol: /[^A-Za-z0-9]/,
 
 }
 
 
-function makePasswordChecker(checks: Array<String>): (password: string) => Array<string> {
-    return (password) => {
+function makePasswordChecker (
+    checks: Array<String>
+): (password: string) => Array<string> {
+    return password => {
         const issues = []
-        checks.forEach((checkStr) => {
-            const [ checkId, argsStr ] = checkStr.split(':')
+        checks.forEach(checkStr => {
+            const [checkId, argsStr] = checkStr.split(':')
             const args = (argsStr || '').split(',')
             let check = PASSWORD_REGEX[checkId]
             if (!check) {
@@ -52,16 +54,14 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
 
     get jsc3l () {
         if (!this._jsc3l) {
-            const {
-                httpRequest,
-                persistentStore,
-            } = this
+            const { httpRequest, persistentStore } = this
             class Jsc3l extends Jsc3lAbstract {
                 persistentStore = persistentStore
-                httpRequest = async (opts) => {
+                httpRequest = async opts => {
                     if (opts.method === 'POST') {
                         opts.headers = opts.header || {}
-                        opts.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+                        opts.headers['Content-Type'] =
+                            'application/x-www-form-urlencoded'
                     }
                     const data = await httpRequest(opts)
                     try {
@@ -76,11 +76,18 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
         return this._jsc3l
     }
 
-    private getSubBackend (jsc3l: Jsc3lAbstract, jsonData: IJsonDataWithAddress) {
-        return new ComchainUserAccount({
-            comchain: jsc3l,
-            ...this.backends
-        }, this, jsonData)
+    private getSubBackend (
+        jsc3l: Jsc3lAbstract,
+        jsonData: IJsonDataWithAddress
+    ) {
+        return new ComchainUserAccount(
+            {
+                comchain: jsc3l,
+                ...this.backends,
+            },
+            this,
+            jsonData
+        )
     }
 
     public get userAccounts () {
@@ -165,33 +172,40 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
             )
         }
 
-        const userAccount = Object.values(this.userAccounts)[0] as ComchainUserAccount
+        const userAccount = Object.values(
+            this.userAccounts
+        )[0] as ComchainUserAccount
         return userAccount.makeCreditRequest(jsonData)
     }
 
-    public async * getTransactions (order:any): AsyncGenerator {
+    public async * getTransactions (order: any): AsyncGenerator {
         yield * mux(
-            Object.values(this.userAccounts).map(
-                (u: ComchainUserAccount) => u.getTransactions(order)),
+            Object.values(this.userAccounts).map((u: ComchainUserAccount) =>
+                u.getTransactions(order)
+            ),
             order
         )
     }
 
     isPasswordStrongEnoughSync = makePasswordChecker([
-        "tooShort:8",
-        "noUpperCase",
-        "noLowerCase",
-        "noDigit",
+        'tooShort:8',
+        'noUpperCase',
+        'noLowerCase',
+        'noDigit',
         // "noSymbol",
     ])
 
-    public async isPasswordStrongEnough (password:string): Promise<Array<string>> {
+    public async isPasswordStrongEnough (
+        password: string
+    ): Promise<Array<string>> {
         return this.isPasswordStrongEnoughSync(password)
     }
 
-    public async createUserAccount ({ password }): Promise<ComchainUserAccount> {
+    public async createUserAccount ({
+        password,
+    }): Promise<ComchainUserAccount> {
         const currencyMgr = await this.jsc3l.getCurrencyMgr(
-            this.jsonData.type.split(':')[1],
+            this.jsonData.type.split(':')[1]
         )
         const wallet = await currencyMgr.wallet.createWallet()
         const cipheredWallet = wallet.encryptWallet(password)
@@ -202,7 +216,7 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
         })
         if (res.error) {
             console.error(`Failed to create user account: ${res.error}`)
-            if (res.error === "account already exists") {
+            if (res.error === 'account already exists') {
                 throw new e.UserAccountAlreadyExists(res.error)
             }
             throw new Error(res.error)
@@ -254,7 +268,7 @@ export class ComchainUserAccount {
             // This will trigger the discovery of master servers and load
             // the server conf of the currency.
             this._currencyMgrPromise = this.backends.comchain.getCurrencyMgr(
-                this.jsonData.wallet.server.name,
+                this.jsonData.wallet.server.name
             )
         }
         return await this._currencyMgrPromise
@@ -271,9 +285,11 @@ export class ComchainUserAccount {
         const balances = await Promise.all(
             bankAccounts.map((bankAccount: any) => bankAccount.getBalance())
         )
-        return <number>balances.map(
-            (a:string) => parseFloat(a)
-        ).reduce((s: number, a:number) => s + a, 0)
+        return <number>(
+            balances
+                .map((a: string) => parseFloat(a))
+                .reduce((s: number, a: number) => s + a, 0)
+        )
     }
 
 
@@ -291,7 +307,9 @@ export class ComchainUserAccount {
     private async getStatus () {
         if (!this._status) {
             const currencyMgr = await this.getCurrencyMgr()
-            this._status = await currencyMgr.bcRead.getAccountStatus(this.address)
+            this._status = await currencyMgr.bcRead.getAccountStatus(
+                this.address
+            )
         }
         return this._status
     }
@@ -321,8 +339,10 @@ export class ComchainUserAccount {
      * return the decrypted wallet. You can override this global setting
      * by providing an async function as first argument.
      */
-    public async unlockWallet(requestCredentialsFromUserFn?: any) {
-        let [ _password, wallet ] = await this._unlockWallet(requestCredentialsFromUserFn)
+    public async unlockWallet (requestCredentialsFromUserFn?: any) {
+        let [_password, wallet] = await this._unlockWallet(
+            requestCredentialsFromUserFn
+        )
         return wallet
     }
 
@@ -331,8 +351,10 @@ export class ComchainUserAccount {
      * return the decrypted wallet. You can override this global setting
      * by providing an async function as first argument.
      */
-    public async requestCredentials(requestCredentialsFromUserFn?: any) {
-        let [ password, _wallet ] = await this._unlockWallet(requestCredentialsFromUserFn)
+    public async requestCredentials (requestCredentialsFromUserFn?: any) {
+        let [password, _wallet] = await this._unlockWallet(
+            requestCredentialsFromUserFn
+        )
         return password
     }
 
@@ -341,18 +363,21 @@ export class ComchainUserAccount {
      * return the decrypted wallet. You can override this global setting
      * by providing an async function as first argument.
      */
-    private async _unlockWallet(requestCredentialsFromUserFn?: any) {
+    private async _unlockWallet (requestCredentialsFromUserFn?: any) {
         let password
         let state = 'firstTry'
-        requestCredentialsFromUserFn = requestCredentialsFromUserFn || this.parent.requestLocalPassword
+        requestCredentialsFromUserFn =
+            requestCredentialsFromUserFn || this.parent.requestLocalPassword
         while (true) {
             password = await requestCredentialsFromUserFn(state, this)
             try {
                 return [
                     password,
                     this.backends.comchain.wallet.getWalletFromPrivKeyFile(
-                        JSON.stringify(this.jsonData.wallet), password),
-                    ]
+                        JSON.stringify(this.jsonData.wallet),
+                        password
+                    ),
+                ]
             } catch (e) {
                 state = 'failedUnlock'
                 console.log('Failed to unlock wallet', e)
@@ -379,18 +404,21 @@ export class ComchainUserAccount {
                     {
                         comchain: {
                             address: this.jsonData.address,
-                            type: 'Nant'
+                            type: 'Nant',
                         },
-                    })
+                    }
+                )
             )
         }
         if (currencyMgr.customization.hasCM()) {
             accounts.push(
                 new ComchainAccount(
                     { comchain: this, ...this.backends },
-                    this, {
+                    this,
+                    {
                         comchain: { type: 'Cm' },
-                    })
+                    }
+                )
             )
         }
         return accounts
@@ -409,38 +437,44 @@ export class ComchainUserAccount {
         let offset = 0
         while (true) {
             const transactionsData = await currencyMgr.ajaxReq.getTransList(
-                `0x${this.address}`, limit, offset)
-            const uniqueAddresses = transactionsData.map(
-                (t: any) => t[t.direction === 2 ? "addr_from" : "addr_to"]
-            ).filter(
-                (t: any, idx: number, self) => (self.indexOf(t) === idx) &&
-                    (typeof addressResolve[t] === 'undefined') &&
-                    (t !== 'Admin')
-            ).map(
-                (t: any) => t.substring(2)
+                `0x${this.address}`,
+                limit,
+                offset
             )
+            const uniqueAddresses = transactionsData
+                .map((t: any) => t[t.direction === 2 ? 'addr_from' : 'addr_to'])
+                .filter(
+                    (t: any, idx: number, self) =>
+                        self.indexOf(t) === idx &&
+                        typeof addressResolve[t] === 'undefined' &&
+                        t !== 'Admin'
+                )
+                .map((t: any) => t.substring(2))
             if (uniqueAddresses.length > 0) {
-                const partners = await this.backends.odoo.$post('/comchain/partners', {
-                    addresses: uniqueAddresses,
-                })
+                const partners = await this.backends.odoo.$post(
+                    '/comchain/partners',
+                    {
+                        addresses: uniqueAddresses,
+                    }
+                )
                 for (const k in partners) {
                     addressResolve[k] = partners[k]
                 }
             }
-            for (let idx = 0; idx < transactionsData.length; idx++ ) {
+            for (let idx = 0; idx < transactionsData.length; idx++) {
                 const transactionData = transactionsData[idx]
                 if (transactionData.addr_to === `0x${this.address}`) {
                     yield new ComchainTransaction(
                         {
                             ...this.backends,
-                            ...{ comchain: currencyMgr }
+                            ...{ comchain: currencyMgr },
                         },
                         this,
                         {
                             comchain: Object.assign({}, transactionData, {
-                                amount: transactionData.recieved
+                                amount: transactionData.recieved,
                             }),
-                            odoo: addressResolve
+                            odoo: addressResolve,
                         }
                     )
                 }
@@ -448,14 +482,14 @@ export class ComchainUserAccount {
                     yield new ComchainTransaction(
                         {
                             ...this.backends,
-                            ...{ comchain: currencyMgr }
+                            ...{ comchain: currencyMgr },
                         },
                         this,
                         {
                             comchain: Object.assign({}, transactionData, {
-                                amount: -transactionData.sent
+                                amount: -transactionData.sent,
                             }),
-                            odoo: addressResolve
+                            odoo: addressResolve,
                         }
                     )
                 }
@@ -467,7 +501,9 @@ export class ComchainUserAccount {
         }
     }
 
-    public async makeCreditRequest (jsonData: t.JsonData): Promise<t.ICreditRequest> {
+    public async makeCreditRequest (
+        jsonData: t.JsonData
+    ): Promise<t.ICreditRequest> {
         const currencyMgr = await this.getCurrencyMgr()
         return new ComchainCreditRequest(
             {
