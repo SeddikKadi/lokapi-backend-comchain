@@ -33,10 +33,6 @@ export class ComchainCreditRequest extends BridgeObject implements t.ICreditRequ
         return this.jsonData.odoo.name
     }
 
-    get relatedUser () {
-        return this.jsonData.odoo.name
-    }
-
     get backendId () {
         return this.parent.internalId
     }

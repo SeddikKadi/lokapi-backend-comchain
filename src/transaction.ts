@@ -43,13 +43,4 @@ export class ComchainTransaction extends BridgeObject implements t.ITransaction 
         return this.jsonData.odoo[add.substring(2)]?.public_name || add
     }
 
-    get relatedUser () {
-        const direction = this.jsonData.comchain.direction === 2
-        let add = this.jsonData.comchain[direction ? "addr_from": "addr_to"]
-        if (add === 'Admin') {
-            return { display: 'Admin' }
-        }
-        return { display: this.jsonData.odoo[add.substring(2)]?.public_name || add }
-    }
-
 }
