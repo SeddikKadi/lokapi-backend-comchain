@@ -40,7 +40,7 @@ export class ComchainTransaction extends BridgeObject implements t.ITransaction 
         if (add === 'Admin') {
             return 'Admin'
         }
-        return this.jsonData.odoo[add.substring(2)]?.display_name || add
+        return this.jsonData.odoo[add.substring(2)]?.public_name || add
     }
 
     get relatedUser () {
@@ -49,7 +49,7 @@ export class ComchainTransaction extends BridgeObject implements t.ITransaction 
         if (add === 'Admin') {
             return { display: 'Admin' }
         }
-        return { display: this.jsonData.odoo[add.substring(2)]?.display_name || add }
+        return { display: this.jsonData.odoo[add.substring(2)]?.public_name || add }
     }
 
 }

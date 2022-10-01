@@ -451,14 +451,14 @@ export class ComchainUserAccount {
                 )
                 .map((t: any) => t.substring(2))
             if (uniqueAddresses.length > 0) {
-                const partners = await this.backends.odoo.$post(
-                    '/comchain/partners',
+                const contacts = await this.backends.odoo.$post(
+                    '/comchain/contact',
                     {
                         addresses: uniqueAddresses,
                     }
                 )
-                for (const k in partners) {
-                    addressResolve[k] = partners[k]
+                for (const k in contacts) {
+                    addressResolve[k] = contacts[k]
                 }
             }
             for (let idx = 0; idx < transactionsData.length; idx++) {
