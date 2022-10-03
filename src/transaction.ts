@@ -1,8 +1,8 @@
 import { t } from '@lokavaluto/lokapi'
-import { BridgeObject } from '@lokavaluto/lokapi/build/backend'
+import { BridgeObject, Transaction } from '@lokavaluto/lokapi/build/backend'
 
 
-export class ComchainTransaction extends BridgeObject implements t.ITransaction {
+export class ComchainTransaction extends Transaction implements t.ITransaction {
 
     get amount () {
         return (this.jsonData.comchain.amount / 100.0).toString()

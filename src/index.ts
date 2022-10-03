@@ -178,12 +178,12 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
         return userAccount.makeCreditRequest(jsonData)
     }
 
-    public async * getTransactions (order: any): AsyncGenerator {
-        yield * mux(
+    public async * getTransactions (opts: any): AsyncGenerator {
+        yield * ComchainTransaction.mux(
             Object.values(this.userAccounts).map((u: ComchainUserAccount) =>
-                u.getTransactions(order)
+                u.getTransactions(opts)
             ),
-            order
+            opts?.order || ['-date']
         )
     }
 
@@ -428,19 +428,39 @@ export class ComchainUserAccount {
         return `comchain:${this.address}`
     }
 
-    public async * getTransactions (order: any): AsyncGenerator {
+    public async * getTransactions (opts: any): AsyncGenerator {
         if (!this.active) return
+
+        let dateBoundaries = false
+        switch (
+            [opts?.dateBegin, opts?.dateEnd]
+                .map((x) => (x ? '1' : '0'))
+                .join('')
+        ) {
+            case '10':
+            case '01':
+                throw new Error('Unsupported partial date boundaries')
+            case '11':
+                dateBoundaries = true
+                break
+        }
 
         const currencyMgr = await this.getCurrencyMgr()
         const addressResolve = {}
         const limit = 30
         let offset = 0
         while (true) {
-            const transactionsData = await currencyMgr.ajaxReq.getTransList(
-                `0x${this.address}`,
-                limit,
-                offset
-            )
+            let transactionsData = await (dateBoundaries
+                ? currencyMgr.ajaxReq.getExportTransList(
+                      `0x${this.address}`,
+                      Math.round(opts.dateBegin.getTime() / 1000),
+                      Math.round(opts.dateEnd.getTime() / 1000)
+                  )
+                : currencyMgr.ajaxReq.getTransList(
+                      `0x${this.address}`,
+                      limit,
+                      offset
+                  ))
             const uniqueAddresses = transactionsData
                 .map((t: any) => t[t.direction === 2 ? 'addr_from' : 'addr_to'])
                 .filter(
@@ -494,6 +514,7 @@ export class ComchainUserAccount {
                     )
                 }
             }
+            if (dateBoundaries) break
             if (transactionsData.length < limit) {
                 return
             }
