@@ -19,11 +19,14 @@ export class ComchainTransaction extends Transaction implements t.ITransaction {
     get description () {
         if (this.parent.jsonData.message_key) {
             try {
-                const data = this.backends.comchain.jsc3l.memo.getTransactionMemo(
-                    this.jsonData.comchain, `0x${this.parent.jsonData.wallet.address}`,
-                    this.parent.jsonData.message_key)
+                const data =
+                    this.backends.comchain.jsc3l.memo.getTransactionMemo(
+                        this.jsonData.comchain,
+                        `0x${this.parent.jsonData.wallet.address}`,
+                        this.parent.jsonData.message_key
+                    )
                 return data
-            } catch(err) {
+            } catch (err) {
                 console.error("Couldn't decipher transaction message.")
             }
         }
@@ -36,7 +39,7 @@ export class ComchainTransaction extends Transaction implements t.ITransaction {
 
     get related () {
         const direction = this.jsonData.comchain.direction === 2
-        let add = this.jsonData.comchain[direction ? "addr_from": "addr_to"]
+        let add = this.jsonData.comchain[direction ? 'addr_from' : 'addr_to']
         if (add === 'Admin') {
             return 'Admin'
         }

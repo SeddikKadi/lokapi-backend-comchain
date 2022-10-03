@@ -30,9 +30,9 @@ const PASSWORD_REGEX = {
 function makePasswordChecker (
     checks: Array<String>
 ): (password: string) => Array<string> {
-    return password => {
+    return (password) => {
         const issues = []
-        checks.forEach(checkStr => {
+        checks.forEach((checkStr) => {
             const [checkId, argsStr] = checkStr.split(':')
             const args = (argsStr || '').split(',')
             let check = PASSWORD_REGEX[checkId]
@@ -57,7 +57,7 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
             const { httpRequest, persistentStore } = this
             class Jsc3l extends Jsc3lAbstract {
                 persistentStore = persistentStore
-                httpRequest = async opts => {
+                httpRequest = async (opts) => {
                     if (opts.method === 'POST') {
                         opts.headers = opts.header || {}
                         opts.headers['Content-Type'] =
@@ -99,9 +99,8 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
                         this.jsc3l,
                         bankAccountData
                     )
-                    this._userAccounts[
-                        comchainUserAccount.internalId
-                    ] = comchainUserAccount
+                    this._userAccounts[comchainUserAccount.internalId] =
+                        comchainUserAccount
                 }
             )
         }
