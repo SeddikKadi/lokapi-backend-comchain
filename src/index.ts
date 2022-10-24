@@ -315,14 +315,14 @@ export class ComchainUserAccount {
 
 
     public async hasUserAccountValidationRights () {
-        // In comchain, either you are admin or not
-        return (await this.getType()) == 2
+        let accountType = await this.getType()
+        return accountType == 2 || accountType == 4
     }
 
 
     public async hasCreditRequestValidationRights () {
-        // In comchain, either you are admin or not
-        return (await this.getType()) == 2
+        let accountType = await this.getType()
+        return accountType == 2 || accountType == 3
     }
 
     public async isActiveAccount () {
