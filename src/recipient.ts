@@ -83,7 +83,7 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
         const comchain = this.backends.comchain
         const wallet = comchain.jsonData.wallet
         const destAddress = this.jsonData.comchain.address
-        const [type, limitMin, limitMax] = [1, -1000, 3000]
+        const [type, limitMin, limitMax] = [0, -1000, 3000]
         if (!(await this.backends.comchain.hasUserAccountValidationRights())) {
             throw new e.PermissionDenied(
                 'You need to be admin to validate creation of wallet'
