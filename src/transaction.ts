@@ -12,6 +12,10 @@ export class ComchainTransaction extends Transaction implements t.ITransaction {
         return this.backends.comchain.customization.cfg.server.currencies.CUR
     }
 
+    get pending () {
+        return this.jsonData.comchain.status !== 0
+    }
+
     get date () {
         return new Date(this.jsonData.comchain.time * 1000)
     }
