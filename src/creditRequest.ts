@@ -66,11 +66,9 @@ export class ComchainCreditRequest extends BridgeObject implements t.ICreditRequ
 
         const clearWallet = await userAccount.unlockWallet()
 
-        const jsonData = await jsc3l.bcTransaction.pledgeAccount(
-            clearWallet, `0x${destAddress}`, amount, data)
-        if (jsonData.isError) {
-            throw jsonData.error
-        }
+        await jsc3l.bcTransaction.pledgeAccount(
+            clearWallet, `0x${destAddress}`, amount, data
+        )
 
         const res = await this.backends.odoo.$post(
             '/partner/validate-credit-request', { ids: [ credit_id ] }
