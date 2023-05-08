@@ -16,7 +16,7 @@
         "url": "git@github.com:Lokavaluto/lokapi-backend-comchain.git"
     },
     "devDependencies": {
-        "@0k.io/prettier": "^0.0.3",
+        "@0k/prettier": "^0.2.1",
         "@types/node": "^15.12.2",
         "@typescript-eslint/eslint-plugin": "^4.29.0",
         "@typescript-eslint/parser": "^4.29.0",
@@ -27,6 +27,6 @@
     },
     "dependencies": {
         "@com-chain/jsc3l": ">=2.0.1-rc",
-        "@lokavaluto/lokapi": ">=0.0.19-alpha"
+        "@lokavaluto/lokapi": "0.1.0 || >=0.1.1-alpha"
     }
 }
