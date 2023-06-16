@@ -3,6 +3,7 @@ import { Contact } from '@lokavaluto/lokapi/build/backend/odoo/contact'
 
 import { sleep, queryUntil } from '@lokavaluto/lokapi/build/utils'
 
+import { APIError } from '@com-chain/jsc3l/build/exception'
 
 import { ComchainPayment } from './payment'
 
@@ -57,20 +58,22 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
                 data
             )
         } catch (err) {
-            if (err.msg === 'Incompatible_Amount') {
-                if (err.data === 'InsufficientNantBalance') {
-                    throw new e.InsufficientBalance(
-                        'Insufficient fund to afford transfer'
+            if (err instanceof APIError) {
+                if (err.message === 'Incompatible_Amount') {
+                    if (err.data === 'InsufficientNantBalance') {
+                        throw new e.InsufficientBalance(
+                            'Insufficient fund to afford transfer'
+                        )
+                    }
+                    throw new e.RefusedAmount(
+                        'Amount refused by backend (given reason: `${err.data}`)'
                     )
                 }
-                throw new e.RefusedAmount(
-                    'Amount refused by backend (given reason: `${err.data}`)'
-                )
-            }
-            if (err.msg === 'Account_Locked_Error') {
-                throw new e.InactiveAccount(
-                    "You can't transfer from/to an inactive account."
-                )
+                if (err.message === 'Account_Locked_Error') {
+                    throw new e.InactiveAccount(
+                        "You can't transfer from/to an inactive account."
+                    )
+                }
             }
             throw err
         }
