@@ -18,7 +18,7 @@ export class ComchainCreditRequest extends BridgeObject implements t.ICreditRequ
     }
 
     get date () {
-        return new Date(this.jsonData.odoo.date)
+        return new Date(1000 * this.jsonData.odoo.date)
     }
 
     get description () {
