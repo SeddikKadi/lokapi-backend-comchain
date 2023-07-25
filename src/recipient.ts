@@ -5,7 +5,7 @@ import { sleep, queryUntil } from '@lokavaluto/lokapi/build/utils'
 
 import { APIError } from '@com-chain/jsc3l/build/exception'
 
-import { ComchainPayment } from './payment'
+import { ComchainTransaction } from './transaction'
 
 
 export class ComchainRecipient extends Contact implements t.IRecipient {
@@ -49,7 +49,7 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
         )
         const clearWallet = await this.backends.comchain.unlockWallet()
 
-        let jsonData
+        let jsonData: t.JsonData
         try {
             jsonData = await jsc3l.bcTransaction.transferNant(
                 clearWallet,
@@ -77,9 +77,28 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
             }
             throw err
         }
-        return new ComchainPayment({ comchain: this.backends.comchain }, this, {
-            comchain: jsonData,
-        })
+        let transactionInfo: t.JsonData
+        try {
+            transactionInfo = await jsc3l.ajaxReq.getTransactionInfo(jsonData)
+        } catch (err: any) {
+            console.error("Confirmation Missing", err)
+            throw new e.PaymentConfirmationMissing(
+                "Couldn't get information on last accepted transaction."
+            )
+        }
+        return new ComchainTransaction(
+            {
+                ...this.backends,
+                ...{ comchain: jsc3l },
+            },
+            this.parent,
+            {
+                comchain: Object.assign({}, transactionInfo, {
+                    amount: -transactionInfo.sent,
+                }),
+                odoo: Object.fromEntries([[destAddress, this.jsonData.odoo]]),
+            }
+        )
     }
 
     public async validateCreation () {

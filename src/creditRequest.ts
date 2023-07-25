@@ -4,8 +4,6 @@ import { BridgeObject } from '@lokavaluto/lokapi/build/backend'
 import { sleep, queryUntil } from '@lokavaluto/lokapi/build/utils'
 
 
-import { ComchainPayment } from './payment'
-
 
 export class ComchainCreditRequest extends BridgeObject implements t.ICreditRequest {
 
