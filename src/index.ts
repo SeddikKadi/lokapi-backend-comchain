@@ -259,6 +259,27 @@ export class ComchainUserAccount {
     }
 
 
+    /**
+     * getPendingTopUp on the User Account gets pending top ups in the
+     * only creditable bank account
+     */
+    public async getPendingTopUp (): Promise<Array<any>> {
+        const bankAccounts = await this.getAccounts()
+	    const creditableAccounts = bankAccounts.filter(
+	        (bankAccount) => bankAccount.creditable
+	    )
+	    if (creditableAccounts.length > 1) {
+	        throw new Error(
+		        "Unsupported retrieval of pending top ups on multiple " +
+                "creditable sub-accounts"
+	        )
+	    }
+	    if (creditableAccounts.length === 0) {
+	        return []
+	    }
+	    return await creditableAccounts[0].getPendingTopUp()
+    }
+
     private _type: number
     private async getType () {
         if (!this._type) {
