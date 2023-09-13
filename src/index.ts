@@ -244,7 +244,8 @@ export class ComchainUserAccount {
 
 
     /**
-     * getBalance on the User Account sums all the balances of user accounts
+     * getBalance on the User Account sums all the balances of user
+     * accounts
      */
     public async getBalance (): Promise<number> {
         const bankAccounts = await this.getAccounts()
