@@ -2,10 +2,10 @@ import { t } from '@lokavaluto/lokapi'
 
 import { ComchainRecipient } from "./recipient"
 
-import { BridgeObject } from '@lokavaluto/lokapi/build/backend'
+import Account from "@lokavaluto/lokapi/build/backend/odoo/account"
 
 
-export class ComchainAccount extends BridgeObject implements t.IAccount {
+export class ComchainAccount extends Account implements t.IAccount {
 
     get creditable() {
         return this.type === 'Nant'

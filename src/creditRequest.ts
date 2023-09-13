@@ -1,38 +1,18 @@
 import { t, e } from '@lokavaluto/lokapi'
-import { BridgeObject } from '@lokavaluto/lokapi/build/backend'
+import CreditRequest from '@lokavaluto/lokapi/build/backend/odoo/creditRequest'
 
 import { sleep, queryUntil } from '@lokavaluto/lokapi/build/utils'
 
 
 
-export class ComchainCreditRequest extends BridgeObject implements t.ICreditRequest {
-
-    get amount () {
-        return (this.jsonData.odoo.amount).toString()
-    }
+export class ComchainCreditRequest extends CreditRequest implements t.ICreditRequest {
 
     get currency () {
         return this.backends.comchain.customization.cfg.server.currencies.CUR
     }
 
-    get date () {
-        return new Date(1000 * this.jsonData.odoo.date)
-    }
-
-    get description () {
-        return ''
-    }
-
     get id () {
         return this.jsonData.comchain.hash
-    }
-
-    get related () {
-        return this.jsonData.odoo.name
-    }
-
-    get backendId () {
-        return this.parent.internalId
     }
 
     public async validate () {
