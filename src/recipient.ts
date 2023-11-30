@@ -166,4 +166,20 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
         return `${this.parent.internalId}/${this.jsonData.comchain.address}`
     }
 
+    /**
+     * Discard creation request for this recipient
+     *
+     * @throws {RequestFailed, APIRequestFailed, InvalidCredentials, InvalidJson}
+     *
+     * @returns Object
+     */
+    public async discardCreateRequest (): Promise<void> {
+        const address = this.jsonData.comchain.address
+        await this.backends.odoo.$post(
+            `/comchain/discard`, {
+                recipient_id: this.jsonData.odoo.id,
+                address
+            }
+        )
+    }
 }
