@@ -1,17 +1,17 @@
 import { t } from '@lokavaluto/lokapi'
 
-import { ComchainRecipient } from "./recipient"
+import { ComchainRecipient } from './recipient'
 
-import Account from "@lokavaluto/lokapi/build/backend/odoo/account"
+import Account from '@lokavaluto/lokapi/build/backend/odoo/account'
 
 
 export class ComchainAccount extends Account implements t.IAccount {
 
-    get creditable() {
+    get creditable () {
         return this.type === 'Nant'
     }
 
-    get type() {
+    get type () {
         return this.jsonData.comchain.type
     }
 
@@ -29,9 +29,9 @@ export class ComchainAccount extends Account implements t.IAccount {
     public async getCurrencyName () {
         let type = this.type
         let currencies = this.backends.comchain.customization.getCurrencies()
-        if (type === "Nant") {
+        if (type === 'Nant') {
             return currencies['CUR_nanti']
-        } else if (type === "Cm") {
+        } else if (type === 'Cm') {
             return currencies['CUR_credit_mut']
         } else {
             throw new Error(`Unexpected type ${this.type} for account`)
@@ -42,7 +42,11 @@ export class ComchainAccount extends Account implements t.IAccount {
         return `${this.parent.internalId}/${this.type}`
     }
 
-    public async transfer (recipient: ComchainRecipient, amount: number, description: string) {
+    public async transfer (
+        recipient: ComchainRecipient,
+        amount: number,
+        description: string
+    ) {
         // On comchain, account transfer is managed through the owner account
         return recipient.transfer(amount, description)
     }

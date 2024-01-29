@@ -81,7 +81,7 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
         try {
             transactionInfo = await jsc3l.ajaxReq.getTransactionInfo(jsonData)
         } catch (err: any) {
-            console.error("Confirmation Missing", err)
+            console.error('Confirmation Missing', err)
             throw new e.PaymentConfirmationMissing(
                 "Couldn't get information on last accepted transaction."
             )
@@ -128,7 +128,7 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
                 queryUntil(
                     () =>
                         this.parent.jsc3l.bcRead.getAccountStatus(destAddress),
-                    res => res === 1
+                    (res) => res === 1
                 )
             } catch (err) {
                 if (err instanceof e.TimeoutError) {

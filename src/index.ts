@@ -66,8 +66,9 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
                         this.jsc3l,
                         bankAccountData
                     )
-                    this._userAccounts[comchainUserAccount.internalId] =
-                        comchainUserAccount
+                    this._userAccounts[
+                        comchainUserAccount.internalId
+                    ] = comchainUserAccount
                 }
             )
         }
@@ -266,19 +267,19 @@ export class ComchainUserAccount {
      */
     public async getPendingTopUp (): Promise<Array<any>> {
         const bankAccounts = await this.getAccounts()
-	    const creditableAccounts = bankAccounts.filter(
-	        (bankAccount) => bankAccount.creditable
-	    )
-	    if (creditableAccounts.length > 1) {
-	        throw new Error(
-		        "Unsupported retrieval of pending top ups on multiple " +
-                "creditable sub-accounts"
-	        )
-	    }
-	    if (creditableAccounts.length === 0) {
-	        return []
-	    }
-	    return await creditableAccounts[0].getPendingTopUp()
+        const creditableAccounts = bankAccounts.filter(
+            (bankAccount) => bankAccount.creditable
+        )
+        if (creditableAccounts.length > 1) {
+            throw new Error(
+                'Unsupported retrieval of pending top ups on multiple ' +
+                    'creditable sub-accounts'
+            )
+        }
+        if (creditableAccounts.length === 0) {
+            return []
+        }
+        return await creditableAccounts[0].getPendingTopUp()
     }
 
     private _type: number

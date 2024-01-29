@@ -5,7 +5,8 @@ import { sleep, queryUntil } from '@lokavaluto/lokapi/build/utils'
 
 
 
-export class ComchainCreditRequest extends CreditRequest implements t.ICreditRequest {
+export class ComchainCreditRequest extends CreditRequest
+    implements t.ICreditRequest {
 
     get currency () {
         return this.backends.comchain.customization.cfg.server.currencies.CUR
@@ -26,33 +27,45 @@ export class ComchainCreditRequest extends CreditRequest implements t.ICreditReq
 
         if (!(await userAccount.isActiveAccount())) {
             throw new e.InactiveAccount(
-                "You can't validate credit requests from an inactive account.")
+                "You can't validate credit requests from an inactive account."
+            )
         }
 
         if (!(await userAccount.hasCreditRequestValidationRights())) {
             throw new e.PermissionDenied(
-                "You need to be admin to validate credit requests")
+                'You need to be admin to validate credit requests'
+            )
         }
 
         const messageKey = await jsc3l.ajaxReq.getMessageKey(
-            `0x${destAddress}`, false)
+            `0x${destAddress}`,
+            false
+        )
 
         const data = jsc3l.memo.getTxMemoCipheredData(
-            null, messageKey.public_message_key,
-            null, "",
+            null,
+            messageKey.public_message_key,
+            null,
+            ''
         )
 
         const clearWallet = await userAccount.unlockWallet()
 
         await jsc3l.bcTransaction.pledgeAccount(
-            clearWallet, `0x${destAddress}`, amount, data
+            clearWallet,
+            `0x${destAddress}`,
+            amount,
+            data
         )
 
         const res = await this.backends.odoo.$post(
-            '/partner/validate-credit-request', { ids: [ credit_id ] }
+            '/partner/validate-credit-request',
+            { ids: [credit_id] }
         )
         if (!res) {
-            throw new Error(`Admin backend refused activation of ${destAddress}`)
+            throw new Error(
+                `Admin backend refused activation of ${destAddress}`
+            )
         }
 
         return
