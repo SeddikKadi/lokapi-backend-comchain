@@ -146,6 +146,7 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
         const res = await this.backends.odoo.$post('/comchain/activate', {
             accounts: [
                 {
+                    recipient_id: this.jsonData.odoo.id,
                     address: destAddress,
                     type,
                     credit_min: limitMin,

@@ -168,18 +168,17 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
         return this.isPasswordStrongEnoughSync(password)
     }
 
-    public async createUserAccount ({
-        password,
-    }): Promise<ComchainUserAccount> {
-        const currencyMgr = await this.jsc3l.getCurrencyMgr(
-            this.jsonData.type.split(':')[1]
-        )
-        const wallet = await currencyMgr.wallet.createWallet()
-        const cipheredWallet = wallet.encryptWallet(password)
-        let res = await this.backends.odoo.$post('/comchain/register', {
+    private async _registerWallet (
+        cipheredWallet: t.JsonData,
+        messageKey: string,
+        active: boolean
+    ) {
+
+        const res = await this.backends.odoo.$post('/comchain/register', {
             address: cipheredWallet.address,
             wallet: JSON.stringify(cipheredWallet),
-            message_key: wallet.messageKeysFromWallet(),
+            message_key: messageKey,
+            active,
         })
         if (res.error) {
             console.error(`Failed to create user account: ${res.error}`)
@@ -188,12 +187,47 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
             }
             throw new Error(res.error)
         }
+        if (typeof cipheredWallet.address !== 'string') {
+            throw new Error("Unexpected type for 'address' in ciphered wallet")
+        }
         return this.getSubBackend(this.jsc3l, {
+            active,
+            address: cipheredWallet.address,
+            wallet: cipheredWallet,
+            message_key: messageKey,
+        })
+    }
+
+    public async registerWallet (cipheredWallet): Promise<ComchainUserAccount> {
+        const currencyMgr = await this.jsc3l.getCurrencyMgr(
+            this.jsonData.type.split(':')[1]
+        )
+        const userAccount = this.getSubBackend(this.jsc3l, {
             active: false,
             address: cipheredWallet.address,
             wallet: cipheredWallet,
-            message_key: wallet.messageKeysFromWallet(),
+            message_key: null,
         })
+
+        const wallet = await userAccount.unlockWallet()
+        await wallet.ensureWalletMessageKey()
+        const active = await userAccount.isActiveAccount()
+        const messageKey = wallet.messageKeysFromWallet()
+        return await this._registerWallet(cipheredWallet, messageKey, active)
+    }
+
+    public async createUserAccount ({
+        password,
+    }): Promise<ComchainUserAccount> {
+        const currencyMgr = await this.jsc3l.getCurrencyMgr(
+            this.jsonData.type.split(':')[1]
+        )
+        const wallet = await currencyMgr.wallet.createWallet()
+        const cipheredWallet = wallet.encryptWallet(password)
+        const messageKey = wallet.messageKeysFromWallet()
+
+        return await this._registerWallet(cipheredWallet, messageKey, false)
+
     }
 
 }
