@@ -139,10 +139,11 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
                 }
                 throw err
             }
+        } else {
+            console.log(
+                'Account is already validated, warning administrative backend'
+            )
         }
-        console.log(
-            'Account is already validated, warning administrative backend'
-        )
         const res = await this.backends.odoo.$post('/comchain/activate', {
             accounts: [
                 {
