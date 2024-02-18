@@ -31,11 +31,11 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
         const destAddress = this.jsonData.comchain.address
         const messageKey = await jsc3l.ajaxReq.getMessageKey(
             `0x${destAddress}`,
-            false
+            false,
         )
         if (amount < 0) {
             throw new e.NegativeAmount(
-                `Negative amounts for transfer are invalid (amount: ${amount})`
+                `Negative amounts for transfer are invalid (amount: ${amount})`,
             )
         }
         if (amount == 0) {
@@ -45,7 +45,7 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
             wallet.message_key.pub,
             messageKey.public_message_key,
             description,
-            description
+            description,
         )
         const clearWallet = await this.backends.comchain.unlockWallet()
 
@@ -55,23 +55,23 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
                 clearWallet,
                 destAddress,
                 amount,
-                data
+                data,
             )
         } catch (err) {
             if (err instanceof APIError) {
                 if (err.message === 'Incompatible_Amount') {
                     if (err.data === 'InsufficientNantBalance') {
                         throw new e.InsufficientBalance(
-                            'Insufficient fund to afford transfer'
+                            'Insufficient fund to afford transfer',
                         )
                     }
                     throw new e.RefusedAmount(
-                        'Amount refused by backend (given reason: `${err.data}`)'
+                        'Amount refused by backend (given reason: `${err.data}`)',
                     )
                 }
                 if (err.message === 'Account_Locked_Error') {
                     throw new e.InactiveAccount(
-                        "You can't transfer from/to an inactive account."
+                        "You can't transfer from/to an inactive account.",
                     )
                 }
             }
@@ -83,7 +83,7 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
         } catch (err: any) {
             console.error('Confirmation Missing', err)
             throw new e.PaymentConfirmationMissing(
-                "Couldn't get information on last accepted transaction."
+                "Couldn't get information on last accepted transaction.",
             )
         }
         return new ComchainTransaction(
@@ -97,7 +97,7 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
                     amount: -transactionInfo.sent,
                 }),
                 odoo: Object.fromEntries([[destAddress, this.jsonData.odoo]]),
-            }
+            },
         )
     }
 
@@ -108,11 +108,11 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
         const [type, limitMin, limitMax] = [0, -1000, 3000]
         if (!(await this.backends.comchain.hasUserAccountValidationRights())) {
             throw new e.PermissionDenied(
-                'You need to be admin to validate creation of wallet'
+                'You need to be admin to validate creation of wallet',
             )
         }
         const status = await this.parent.jsc3l.bcRead.getAccountStatus(
-            destAddress
+            destAddress,
         )
         if (status != 1) {
             const clearWallet = await this.backends.comchain.unlockWallet()
@@ -141,7 +141,7 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
             }
         } else {
             console.log(
-                'Account is already validated, warning administrative backend'
+                'Account is already validated, warning administrative backend',
             )
         }
         const res = await this.backends.odoo.$post('/comchain/activate', {
@@ -157,7 +157,7 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
         })
         if (!res) {
             throw new Error(
-                'Admin backend refused activation of ${destAddress}'
+                'Admin backend refused activation of ${destAddress}',
             )
         }
     }
