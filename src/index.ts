@@ -277,6 +277,13 @@ export class ComchainUserAccount {
 
     _currencyMgrPromise: { [index: string]: any }
 
+    /**
+     * getGlobalBalance on User Account allow access to historical global balance
+     */
+    public async getGlobalBalance (blockNb = "pending"): Promise<number> {
+        const currencyMgr = await this.getCurrencyMgr()
+        return await currencyMgr.bcRead.getHistoricalGlobalBalance(this.address, blockNb)
+    }
 
     /**
      * getBalance on the User Account sums all the balances of user
