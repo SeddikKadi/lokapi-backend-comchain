@@ -282,15 +282,24 @@ export class ComchainUserAccount {
      * getBalance on the User Account sums all the balances of user
      * accounts
      */
-    public async getBalance (): Promise<number> {
+    public async getBalance (blockNb: string | number = 'pending'): Promise<string> {
         const bankAccounts = await this.getAccounts()
         const balances = await Promise.all(
-            bankAccounts.map((bankAccount: any) => bankAccount.getBalance())
+            bankAccounts.map((bankAccount: any) => bankAccount.getBalance(blockNb))
         )
-        return <number>(
-            balances
-                .map((a: string) => parseFloat(a))
-                .reduce((s: number, a: number) => s + a, 0)
+        // XXXvlab: should probably provide an helper for these mangling
+        let int2strAmount = (data_int: number): string => {
+            let sign = ""
+            if (data_int < 0) {
+                data_int = -data_int
+                sign = "-"
+            }
+            let data_str = data_int.toString().padStart(3, "0")
+            return `${sign}${data_str.slice(0,-2)}.${data_str.slice(-2)}`
+        }
+        return int2strAmount(balances
+                .map((a: string) => parseInt(a.replace(".", "")))
+            .reduce((s: number, a: number) => s + a, 0)
         )
     }
 

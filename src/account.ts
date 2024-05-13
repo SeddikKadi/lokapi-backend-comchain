@@ -15,10 +15,10 @@ export class ComchainAccount extends Account implements t.IAccount {
         return this.jsonData.comchain.type
     }
 
-    async getBalance () {
+    async getBalance (blockNb: string | number = 'pending') {
         const cc = this.backends.comchain
         const wid = this.parent.jsonData.wallet.address
-        return await cc.bcRead[`get${this.jsonData.comchain.type}Balance`](wid)
+        return await cc.bcRead[`get${this.jsonData.comchain.type}Balance`](wid, blockNb)
     }
 
     public async getSymbol () {
