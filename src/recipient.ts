@@ -77,6 +77,15 @@ export class ComchainRecipient extends Contact implements t.IRecipient {
             }
             throw err
         }
+
+        if (!/^0x[a-fA-F0-9]{64}$/.test(jsonData.toString())) {
+            console.error(
+                'Unexpected response to transferNant (not a transaction id): ',
+                jsonData,
+            )
+            throw new Error('Transaction ID has invalid format')
+        }
+
         let transactionInfo: t.JsonData
         try {
             transactionInfo = await jsc3l.ajaxReq.getTransactionInfo(jsonData)
