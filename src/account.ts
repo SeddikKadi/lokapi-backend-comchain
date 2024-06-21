@@ -45,10 +45,11 @@ export class ComchainAccount extends Account implements t.IAccount {
     public async transfer (
         recipient: ComchainRecipient,
         amount: number,
-        description: string
+        senderMemo: string,
+        recipientMemo: string = senderMemo,
     ) {
         // On comchain, account transfer is managed through the owner account
-        return recipient.transfer(amount, description)
+        return recipient.transfer(amount, senderMemo, recipientMemo)
     }
 
 

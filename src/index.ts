@@ -17,6 +17,8 @@ interface IJsonDataWithAddress extends t.JsonData {
 
 export default abstract class ComchainBackendAbstract extends BackendAbstract {
 
+    splitMemoSupport = true
+
     _jsc3l: Jsc3lAbstract
 
     get jsc3l () {
