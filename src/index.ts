@@ -10,6 +10,7 @@ import { ComchainRecipient } from './recipient'
 import { ComchainTransaction } from './transaction'
 import { ComchainCreditRequest } from './creditRequest'
 
+import UserAccount from '@lokavaluto/lokapi/build/backend/odoo/userAccount'
 
 interface IJsonDataWithAddress extends t.JsonData {
     address: string
@@ -233,19 +234,13 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
 }
 
 
-export class ComchainUserAccount {
+export class ComchainUserAccount extends UserAccount {
 
     address: string
-    parent: BackendAbstract
-    backends: { [index: string]: any }
-    jsonData: { [index: string]: any }
-
 
     constructor (backends, parent, jsonData) {
+        super(backends, parent, jsonData)
         this.address = jsonData.wallet.address
-        this.parent = parent
-        this.backends = backends
-        this.jsonData = jsonData
     }
 
     public get active () {
@@ -277,27 +272,29 @@ export class ComchainUserAccount {
 
     _currencyMgrPromise: { [index: string]: any }
 
-    /**
-     * getGlobalBalance on User Account allow access to historical global balance
-     */
-    public async getGlobalBalance (blockNb = "pending"): Promise<number> {
-        const currencyMgr = await this.getCurrencyMgr()
-        return await currencyMgr.bcRead.getHistoricalGlobalBalance(this.address, blockNb)
-    }
 
     /**
      * getBalance on the User Account sums all the balances of user
      * accounts
      */
-    public async getBalance (): Promise<number> {
+    public async getBalance (blockNb: string | number = 'pending'): Promise<string> {
         const bankAccounts = await this.getAccounts()
         const balances = await Promise.all(
-            bankAccounts.map((bankAccount: any) => bankAccount.getBalance())
+            bankAccounts.map((bankAccount: any) => bankAccount.getBalance(blockNb))
         )
-        return <number>(
-            balances
-                .map((a: string) => parseFloat(a))
-                .reduce((s: number, a: number) => s + a, 0)
+        // XXXvlab: should probably provide an helper for these mangling
+        let int2strAmount = (data_int: number): string => {
+            let sign = ""
+            if (data_int < 0) {
+                data_int = -data_int
+                sign = "-"
+            }
+            let data_str = data_int.toString().padStart(3, "0")
+            return `${sign}${data_str.slice(0,-2)}.${data_str.slice(-2)}`
+        }
+        return int2strAmount(balances
+                .map((a: string) => parseInt(a.replace(".", "")))
+            .reduce((s: number, a: number) => s + a, 0)
         )
     }
 
