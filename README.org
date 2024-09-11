@@ -86,3 +86,14 @@ npm install
 npx tsc -w
 #+end_src
 
+** Launch tests
+
+Tests are managed through =vitest=
+
+#+begin_src sh
+## Run test once
+npm run test
+#+end_src
+
+Note that you can also use ~npx vitest~ command to launch tests in
+watch mode.

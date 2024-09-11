@@ -9,6 +9,7 @@ import { ComchainAccount } from './account'
 import { ComchainRecipient } from './recipient'
 import { ComchainTransaction } from './transaction'
 import { ComchainCreditRequest } from './creditRequest'
+import { intCents2strAmount, strAmount2intCents } from './helpers'
 
 
 interface IJsonDataWithAddress extends t.JsonData {
@@ -289,19 +290,9 @@ export class ComchainUserAccount {
         const balances = await Promise.all(
             bankAccounts.map((bankAccount: any) => bankAccount.getBalance(blockNb))
         )
-        // XXXvlab: should probably provide an helper for these mangling
-        let int2strAmount = (data_int: number): string => {
-            let sign = ""
-            if (data_int < 0) {
-                data_int = -data_int
-                sign = "-"
-            }
-            let data_str = data_int.toString().padStart(3, "0")
-            return `${sign}${data_str.slice(0,-2)}.${data_str.slice(-2)}`
-        }
-        return int2strAmount(balances
-                .map((a: string) => parseInt(a.replace(".", "")))
-            .reduce((s: number, a: number) => s + a, 0)
+        return intCents2strAmount(balances
+                .map((a: string) => strAmount2intCents(a))
+            .reduce((s: bigint, a: bigint) => s + a, 0n)
         )
     }
 

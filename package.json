@@ -7,7 +7,7 @@
     "scripts": {
         "prepare": "tsc",
         "lint": "eslint --ignore-path .gitignore --ext .js,.ts .",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "vitest run --bail 1"
     },
     "author": "Valentin LAB",
     "license": "MIT",
@@ -17,13 +17,19 @@
     },
     "devDependencies": {
         "@0k/prettier": "^0.2.1",
-        "@types/node": "^15.12.2",
+        "@babel/runtime": "^7.15.4",
+        "@types/node": "^20.14.5",
         "@typescript-eslint/eslint-plugin": "^4.29.0",
         "@typescript-eslint/parser": "^4.29.0",
         "eslint": "^7.32.0",
         "eslint-config-standard": "^16.0.3",
-        "typedoc": "^0.22.8",
-        "typescript": "^4.4.4"
+        "jsdom": "^24.1.0",
+        "ts-node": "^10.9.2",
+        "ts-patch": "^3.2.1",
+        "typedoc": "^0.26.7",
+        "typescript": "^5.5.3",
+        "vite": "^5.4.4",
+        "vitest": "^1.6.0"
     },
     "dependencies": {
         "@com-chain/jsc3l": ">=2.0.1-rc",
