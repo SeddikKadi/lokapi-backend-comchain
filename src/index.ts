@@ -108,6 +108,11 @@ export default abstract class ComchainBackendAbstract extends BackendAbstract {
                     'Unsupported yet.'
             )
         }
+        if (Object.keys(jsonData.monujo_backends).length === 0) {
+            throw new Error(
+                'Target recipient has no account in comchain.'
+            )
+        }
         jsonData.monujo_backends[this.internalId].forEach((address: string) => {
             recipients.push(
                 new ComchainRecipient(
