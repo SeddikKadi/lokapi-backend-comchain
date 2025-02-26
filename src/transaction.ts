@@ -33,12 +33,12 @@ export class ComchainTransaction extends Transaction implements t.ITransaction {
     }
 
     get description () {
-        if (this.parent.jsonData.message_key) {
+        if (this.parent.parent.jsonData.message_key) {
             try {
                 const data = this.backends.comchain.jsc3l.memo.getTransactionMemo(
                     this.jsonData.comchain,
-                    `0x${this.parent.jsonData.wallet.address}`,
-                    this.parent.jsonData.message_key
+                    `0x${this.parent.parent.jsonData.wallet.address}`,
+                    this.parent.parent.jsonData.message_key
                 )
                 return data
             } catch (err) {
