@@ -71,4 +71,9 @@ export class ComchainAccount extends Account implements t.IAccount {
         })
     }
 
+    public async isBusinessAccountForFinancialBackend () {
+        return await this.parent.isBusinessAccountForFinancialBackend
+    }
+
+
 }

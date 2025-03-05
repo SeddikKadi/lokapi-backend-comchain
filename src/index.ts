@@ -369,6 +369,10 @@ export class ComchainUserAccount extends UserAccount {
         let accountType = await this.getType()
         return accountType == 2 || accountType == 3
     }
+    
+    public async isBusinessAccountForFinancialBackend () {
+        return (await this.getType()) == 1
+    }
 
     public async isActiveAccount () {
         return (await this.getStatus()) == 1
@@ -613,6 +617,11 @@ export class ComchainUserAccount extends UserAccount {
                 comchain: { address: jsonData.monujo_backend[1] },
             }
         )
+    }
+
+    async isBusinessAccount(): Promise<boolean> { 
+        const bankAccounts = await this.getAccounts()
+        return await bankAccounts[0].isBusinessAccount()
     }
 
 }
