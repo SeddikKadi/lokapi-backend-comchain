@@ -58,7 +58,7 @@ export class ComchainTransaction extends Transaction implements t.ITransaction {
         if (add === 'Admin') {
             return 'Admin'
         }
-        return this.jsonData.odoo[add.substring(2)]?.public_name || add
+        return this.jsonData.odoo.addressResolve[add.substring(2)]?.public_name || add
     }
 
     get isTopUp () {
