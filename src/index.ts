@@ -373,6 +373,10 @@ export class ComchainUserAccount extends UserAccount {
         return currencies.CUR_global
     }
 
+    public getCurrencyId () {
+        return this.jsonData.wallet.server.name
+    }
+
     _errorsCache = new Map<Error, Error>
     @singleton
     private async getCurrencyMgr () {
