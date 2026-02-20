@@ -208,12 +208,7 @@ export class ComchainRecipient extends Recipient implements t.IRecipient {
         const jsc3l = this.parent.jsc3l
         const clearWallet = await this.backends.comchain.unlockWallet()
 
-        const accountTypeToInt = {
-            personal: 0,
-            professional: 1
-        }
-
-        const accountTypeInt = accountTypeToInt[accountType]
+        const accountTypeInt = this.parent.accountTypeToInt[accountType]
         if (accountTypeInt === undefined) {
             throw new Error(`Invalid account type: ${accountType}`)
         }
@@ -224,7 +219,7 @@ export class ComchainRecipient extends Recipient implements t.IRecipient {
                 clearWallet,
                 this.jsonData.comchain.address,
                 status ? 1:0,
-                accountTypeToInt[accountType],
+                accountTypeInt,
                 highLimit,
                 lowLimit
             )
